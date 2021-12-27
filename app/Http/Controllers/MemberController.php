@@ -89,15 +89,25 @@ class MemberController extends BaseController
 
         //Insert a new token
         try {
-            $token = '1234';
+            $token = self::generateToken();
             $token_inserted = DB::insert('insert into login_token (login_unique_id, login_token, login_timestamp) values (?, ?, now())', [$member_unique_id, $token]);
             if($token_inserted) {
-                return response()->json(['code' => 200, 'message' => 'Success.']);
+                return response()->json(['code' => 200, 'message' => 'Success.', 'token' => $token]);
             }else {
                 return response()->json(['code' => 500, 'message' => 'Internal Server Error.']);
             }
         }catch (Exception $e) {
             return response()->json(['code' => 500, 'message' => $e]);
         }
+    }
+
+    private function generateToken($length = 128) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 }
